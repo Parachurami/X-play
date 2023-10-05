@@ -8,22 +8,36 @@ import { Dimensions } from 'react-native';
 import PlayerButton from '../Components/PlayerButton';
 import { AudioContext } from '../Context/AudioProvider';
 
-const {width} = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 const Player = () => {
   const context = useContext(AudioContext);
+
+  const { playbackDuration, playbackPosition } = context;
+
+  const calculateSeekBar = () =>{
+    if(playbackPosition !== null && playbackDuration !== null){
+      return playbackPosition / playbackDuration;
+    }
+    return 0;
+  }
   const percentWidth = value =>{
     let newWidth = (value / 100) * width;
     return newWidth
   }
+  const percentSize = value =>{
+    let size = height
+    let newSize = (value / 100) * size;
+    return newSize;
+  }
   return (
     <Screen>
       <View style={styles.container}>
-        <Text style={styles.audioCount}>{`${context.currentAudioIndex} / ${context.totalAudioCount}`}</Text>
+        <Text style={styles.audioCount}>{`${context.currentAudioIndex + 1} / ${context.totalAudioCount}`}</Text>
         <View style={styles.midBannerContainer}>
-          <MaterialCommunityIcons name='music-circle' size={300} color={color.ACTIVE_BG}/>
+          <MaterialCommunityIcons name='music-circle' size={300} color={context.isPlaying ? color.ACTIVE_BG : color.FONT_MEDIUM}/>
         </View>
         <View style={styles.audioPlayerContainer}>
-          <Text numberOfLines={1} style={styles.audioTitle}>Audio File Name</Text>
+          <Text numberOfLines={1} style={styles.audioTitle}>{context.currentAudio.filename.slice(0, -4)}</Text>
           <Slider
             style={{width: width, height: 40}}
             minimumValue={0}
@@ -31,11 +45,12 @@ const Player = () => {
             minimumTrackTintColor={color.ACTIVE_BG}
             maximumTrackTintColor='#000000'
             thumbTintColor={color.ACTIVE_BG}
+            value={calculateSeekBar()}
           />
           <View style={styles.audioControllers}>
-            <PlayerButton iconType={'PREV'}/>
-            <PlayerButton onPress ={() => console.log('pause')} style={{marginHorizontal: percentWidth(8)}} iconType={'PLAY'}/>
-            <PlayerButton iconType={'NEXT'}/>
+            <PlayerButton size={percentSize(3.6)} iconType={'PREV'}/>
+            <PlayerButton size={percentSize(3.6)} onPress ={() => console.log('pause')} style={{marginHorizontal: percentWidth(8)}} iconType={!context.isPlaying ? 'PAUSE' : 'PLAY'}/>
+            <PlayerButton size={percentSize(3.6)} iconType={'NEXT'}/>
           </View>
         </View>
       </View>
