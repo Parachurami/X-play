@@ -17,7 +17,7 @@ export class AudioProvider extends Component {
             currentAudio:{},
             isPlaying: false,
             currentAudioIndex: null,
-        }
+        } 
     }
     
 
