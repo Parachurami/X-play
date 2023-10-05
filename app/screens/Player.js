@@ -18,7 +18,7 @@ const Player = () => {
   return (
     <Screen>
       <View style={styles.container}>
-        <Text style={styles.audioCount}>1/99</Text>
+        <Text style={styles.audioCount}>{`${context.currentAudioIndex} / ${context.totalAudioCount}`}</Text>
         <View style={styles.midBannerContainer}>
           <MaterialCommunityIcons name='music-circle' size={300} color={color.ACTIVE_BG}/>
         </View>

@@ -17,7 +17,8 @@ export class AudioProvider extends Component {
             currentAudio:{},
             isPlaying: false,
             currentAudioIndex: null,
-        } 
+        }
+        this.totalAudioCount = 0
     }
     
 
@@ -75,6 +76,8 @@ export class AudioProvider extends Component {
             first: (await media).totalCount
         })
 
+        this.totalAudioCount = (await media).totalCount
+
         this.setState({...this.state, dataProvider: dataProvider.cloneWithRows([...audioFiles, ...(await media).assets]), audioFiles: [...audioFiles, ...(await media).assets]})
     }
 
@@ -99,7 +102,7 @@ export class AudioProvider extends Component {
         )
     }
     return (
-      <AudioContext.Provider value={{audioFiles, dataProvider, playbackObj, soundObj, currentAudio, updateState:this.updateState, isPlaying, currentAudioIndex}}>
+      <AudioContext.Provider value={{audioFiles, dataProvider, playbackObj, soundObj, currentAudio, updateState:this.updateState, isPlaying, currentAudioIndex, totalAudioCount:this.totalAudioCount}}>
         {this.props.children}
       </AudioContext.Provider>
     )
