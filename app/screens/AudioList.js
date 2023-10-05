@@ -36,13 +36,14 @@ class AudioList extends Component {
     })
 
     handleAudioPress = async (audio) =>{
-        const {playbackObj, soundObj, currentAudio, updateState, isPlaying} = this.context
+        const {playbackObj, soundObj, currentAudio, updateState, audioFiles} = this.context
         //Playing Audio For The First Time
         if(soundObj === null){
             const playbackObj = new Audio.Sound();
             const status = await play(playbackObj, audio.uri)
+            const index = audioFiles.indexOf(audio)
             console.log(status);
-            return updateState(this.context, {playbackObj: playbackObj, soundObj: status, currentAudio: audio, isPlaying: true})
+            return updateState(this.context, {playbackObj: playbackObj, soundObj: status, currentAudio: audio, isPlaying: true, currentAudioIndex: index})
         }
         // pause audio
         if(soundObj.isLoaded && soundObj.isPlaying && currentAudio.id === audio.id){
@@ -59,15 +60,17 @@ class AudioList extends Component {
         // select another audio
         if(soundObj.isLoaded && currentAudio.id !== audio.id){
             const status = await playNext(playbackObj, audio.uri)
-            return updateState(this.context, {currentAudio: audio, soundObj: status})
+            const index = audioFiles.indexOf(audio);
+            return updateState(this.context, {currentAudio: audio, soundObj: status, currentAudioIndex: index, isPlaying: true})
         }
     }
 
-    rowRenderer = (type, item) =>{
+    rowRenderer = (type, item, index, extendedState) =>{
         return <AudioListItem 
         title={item.filename.slice(0, -4)} 
         duration={item.duration}
-        isPlaying={this.context.isPlaying}
+        isPlaying={extendedState.isPlaying}
+        activeListItem={this.context.currentAudioIndex === index}
         onOptionPress={() => {
             this.currentItem = item.filename.slice(0, -4);
             this.setState({...this.state, optionModalVisible: true})
@@ -78,7 +81,7 @@ class AudioList extends Component {
     render(){
         return (
             <AudioContext.Consumer>
-                {({dataProvider}) => {
+                {({dataProvider, isPlaying}) => {
                     return (
                         <GestureHandlerRootView style={{flex: 1}}>
                         <Screen>
@@ -86,6 +89,7 @@ class AudioList extends Component {
                             dataProvider={dataProvider} 
                             layoutProvider={this.layoutProvider} 
                             rowRenderer={this.rowRenderer}
+                            extendedState={{isPlaying}}
                             />
                             <OptionModal 
                                 currentItem={this.currentItem} 
