@@ -41,6 +41,9 @@ const Player = () => {
     if(context.soundObj === null){
       const audio = context.currentAudio;
       const status = await play(context.playbackObj, audio.uri);
+      context.playbackObj.setOnPlaybackStatusUpdate(
+        context.OnPlaybackStatusUpdate
+      )
       return context.updateState(context, {
         soundObj: status,
         currentAudio: audio,
@@ -99,7 +102,9 @@ const Player = () => {
           soundObj: status, 
           currentAudio: audio, 
           isPlaying: true, 
-          currentAudioIndex: index
+          currentAudioIndex: index,
+          playbackPosition: null,
+          playbackDuration: null,
       }
     );
     storeAudioForNextOpening(audio, index)
@@ -137,7 +142,9 @@ const Player = () => {
           soundObj: status, 
           currentAudio: audio, 
           isPlaying: true, 
-          currentAudioIndex: index
+          currentAudioIndex: index,
+          playbackPosition: null,
+          playbackDuration: null,
       }
     );
     storeAudioForNextOpening(audio, index)
