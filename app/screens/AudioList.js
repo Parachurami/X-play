@@ -48,7 +48,7 @@ class AudioList extends Component {
             const nextAudioIndex = this.context.currentAudioIndex + 1;
             if(nextAudioIndex >= this.context.totalAudioCount){
                 this.context.playbackObj.unloadAsync()
-                return this.context.updateState(this.context, {
+                this.context.updateState(this.context, {
                     soundObj: null,
                     currentAudio: this.context.audioFiles[0],
                     isPlaying: false,
@@ -56,6 +56,8 @@ class AudioList extends Component {
                     playbackDuration: null,
                     playbackPosition: null
                 })
+                return await storeAudioForNextOpening(this.context.audioFiles[0], 0);
+
             }
             const audio = this.context.audioFiles[nextAudioIndex];
             const status = await playNext(this.context.playbackObj, audio.uri);
