@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Screen from '../Components/Screen';
 import color from '../misc/color';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -29,6 +29,13 @@ const Player = () => {
     let newSize = (value / 100) * size;
     return newSize;
   }
+
+  useEffect(() =>{
+    context.loadPreviousAudio()
+  }, [])
+
+  if(!context.currentAudio) return null
+
   return (
     <Screen>
       <View style={styles.container}>

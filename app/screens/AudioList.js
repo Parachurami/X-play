@@ -9,6 +9,7 @@ import OptionModal from '../Components/OptionModal'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { pause, play, playNext, resume } from '../misc/audioController'
 import { Audio } from 'expo-av'
+import { storeAudioForNextOpening } from '../misc/helper'
 
 class AudioList extends Component {
     static contextType = AudioContext
@@ -64,6 +65,8 @@ class AudioList extends Component {
                 isPlaying: true,
                 currentAudioIndex: nextAudioIndex
             })
+            
+            await storeAudioForNextOpening(audio,nextAudioIndex);
         }
     }
 
@@ -84,7 +87,8 @@ class AudioList extends Component {
                     currentAudioIndex: index
                 }
             );
-            return playbackObj.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate)
+            playbackObj.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate)
+            return storeAudioForNextOpening(audio,index);
         }
         // pause audio
         if(soundObj.isLoaded && soundObj.isPlaying && currentAudio.id === audio.id){
@@ -102,8 +106,13 @@ class AudioList extends Component {
         if(soundObj.isLoaded && currentAudio.id !== audio.id){
             const status = await playNext(playbackObj, audio.uri)
             const index = audioFiles.indexOf(audio);
-            return updateState(this.context, {currentAudio: audio, soundObj: status, currentAudioIndex: index, isPlaying: true})
+            updateState(this.context, {currentAudio: audio, soundObj: status, currentAudioIndex: index, isPlaying: true})
+            return storeAudioForNextOpening(audio,index);
         }
+    }
+
+    componentDidMount(){
+        this.context.loadPreviousAudio();
     }
 
     rowRenderer = (type, item, index, extendedState) =>{
@@ -123,6 +132,8 @@ class AudioList extends Component {
         return (
             <AudioContext.Consumer>
                 {({dataProvider, isPlaying}) => {
+                    // console.log(dataProvider)
+                    if(!dataProvider._data.length) return null;
                     return (
                         <GestureHandlerRootView style={{flex: 1}}>
                         <Screen>
