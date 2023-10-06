@@ -11,7 +11,7 @@ const AppNavigation = () => {
     <Tab.Navigator>
         <Tab.Screen name='AudioList' component={AudioList} options={{
             tabBarIcon:({color, size}) => (<MaterialIcons name='headset' size={size} color={color} />),
-            headerShown:false
+            headerShown:false,
         }} />
         <Tab.Screen name='Player' component={Player} options={{
             tabBarIcon:({color, size}) => (<FontAwesome5 name='compact-disc' size={size} color={color} />),

@@ -151,6 +151,9 @@ class AudioList extends Component {
                                 visible={this.state.optionModalVisible}
                                 onPlayPress={() => {}}
                                 onPlayListPress={() =>{
+                                    this,this.context.updateState(this.context, {
+                                        addToPlayList: this.currentItem
+                                    })
                                     this.props.navigation.navigate('PlayList')
                                 }}
                             />
