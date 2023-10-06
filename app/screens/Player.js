@@ -7,6 +7,7 @@ import Slider from '@react-native-community/slider';
 import { Dimensions } from 'react-native';
 import PlayerButton from '../Components/PlayerButton';
 import { AudioContext } from '../Context/AudioProvider';
+import { pause, play, resume } from '../misc/audioController';
 
 const {width, height} = Dimensions.get('window')
 const Player = () => {
@@ -34,6 +35,41 @@ const Player = () => {
     context.loadPreviousAudio()
   }, [])
 
+  const handlePlayPause =  async() =>{
+    //PLAY
+    if(context.soundObj === null){
+      const audio = context.currentAudio;
+      const status = await play(context.playbackObj, audio.uri);
+      return context.updateState(context, {
+        soundObj: status,
+        currentAudio: audio,
+        isPlaying: true,
+        currentAudioIndex: context.currentAudioIndex
+      })
+    }
+    //PAUSE
+    if(context.soundObj && context.soundObj.isPlaying){
+      const status = await pause(context.playbackObj)
+      return context.updateState(context, {
+        soundObj: status,
+        isPlaying: false,
+      })
+    }
+
+    //RESUME
+    if(context.soundObj && !context.soundObj.isPlaying){
+      const status = await resume(context.playbackObj)
+      return context.updateState(context, {
+        soundObj: status,
+        isPlaying: true,
+      })
+    }
+  }
+
+  const handleNext = () =>{
+    
+  }
+
   if(!context.currentAudio) return null
 
   return (
@@ -56,8 +92,8 @@ const Player = () => {
           />
           <View style={styles.audioControllers}>
             <PlayerButton size={percentSize(3.6)} iconType={'PREV'}/>
-            <PlayerButton size={percentSize(3.6)} onPress ={() => console.log('pause')} style={{marginHorizontal: percentWidth(8)}} iconType={!context.isPlaying ? 'PAUSE' : 'PLAY'}/>
-            <PlayerButton size={percentSize(3.6)} iconType={'NEXT'}/>
+            <PlayerButton size={percentSize(3.6)} onPress ={handlePlayPause} style={{marginHorizontal: percentWidth(8)}} iconType={!context.isPlaying ? 'PAUSE' : 'PLAY'}/>
+            <PlayerButton size={percentSize(3.6)} onPress={handleNext} iconType={'NEXT'}/>
           </View>
         </View>
       </View>
