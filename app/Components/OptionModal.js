@@ -12,13 +12,21 @@ const OptionModal = ({visible, onClose, currentItem, onPlayPress, onPlayListPres
         let newWidth = (value / 100) * width;
         return newWidth
     }
+    const {filename} = currentItem
+
+    const renderFilename = () =>{
+        if(filename){
+            return `${filename.slice(0, -4)}`;
+        }
+        return `${null}`;
+    }
   return (
     <>
     <StatusBar hidden/>
     <Modal animationType='slide' transparent visible={visible}>
         <View style={styles.modal}>
             {/* <View style={styles.line}/> */}
-            <Text numberOfLines={2} style={styles.title}>{currentItem}</Text>
+            <Text numberOfLines={2} style={styles.title}>{renderFilename()}</Text>
             <View style={styles.optionContainer}>
                 <TouchableOpacity onPress={onPlayPress} style={styles.optionItem(percentWidth(10))}>
                     <MaterialIcons name='play-circle-fill' size={24}/>

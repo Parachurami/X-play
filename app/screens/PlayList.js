@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, FlatList } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, FlatList, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native';
 import color from '../misc/color';
@@ -62,17 +62,61 @@ const PlayList = () => {
         renderPlayList()
       }
     }, [])
+
+    const handleBannerPress = async (playList) =>{
+      // update playlist if there is any selected animationDuration
+      if(addToPlayList){
+        const result = await AsyncStorage.getItem('playlist')
+
+        let oldList = []
+        let updatedList = [];
+        let sameAudio = false
+        if(result !== null){
+          oldList = JSON.parse(result);
+          updatedList = oldList.filter(list =>{
+            if(list.id === playList.id){
+              // we want to check if that same audio is already inside 
+              // our list or not  
+              for(let audio of list.audios){
+                if(audio.id === addToPlayList.id){
+                  // alert with some message
+                  sameAudio = true;
+                  return;
+                }
+              }
+              // otherwise update the playlist
+              list.audios = [...list.audios, addToPlayList];
+            }
+            return list;
+
+          })
+          console.log(oldList);
+        }
+        if(sameAudio){
+          Alert.alert('Found same audio!',
+           `${addToPlayList.filename.slice(0, -4)} is already inside ${playList.title}`
+          )
+          sameAudio = false
+          return updateState(context, {addToPlayList: null})
+        }
+        updateState(context, {addToPlayList: null, playList: [...updatedList]})
+        return AsyncStorage.setItem('playlist', JSON.stringify([...updatedList]))
+      }
+
+      // if there is no audio
+      console.log('opening list');
+    }
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
       {playList.length ?
       playList.map((item) => (
-        <TouchableOpacity key={item.id.toString()} style={styles.playListBanner}>
+        <TouchableOpacity key={item.id.toString()} style={styles.playListBanner} onPress={() => handleBannerPress(item)}>
           <Text>{item.title}</Text>
           <Text style={styles.audioCount}>{item.audios.length > 1? `${item.audios.length} Songs`: `${item.audios.length} Song`}</Text>
       </TouchableOpacity>
       )):
-      {}
+      <></>
       }
       <TouchableOpacity onPress={() => setModalVisible(true)} style={{marginTop: 15}}>
         <Text style={styles.playListBtn}>+ Add New Playlist</Text>

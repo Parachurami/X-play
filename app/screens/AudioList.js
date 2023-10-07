@@ -124,7 +124,7 @@ class AudioList extends Component {
         isPlaying={extendedState.isPlaying}
         activeListItem={this.context.currentAudioIndex === index}
         onOptionPress={() => {
-            this.currentItem = item.filename.slice(0, -4);
+            this.currentItem = item;
             this.setState({...this.state, optionModalVisible: true})
         }}
         onAudioPress={() => this.handleAudioPress(item)}
@@ -151,7 +151,7 @@ class AudioList extends Component {
                                 visible={this.state.optionModalVisible}
                                 onPlayPress={() => {}}
                                 onPlayListPress={() =>{
-                                    this,this.context.updateState(this.context, {
+                                    this.context.updateState(this.context, {
                                         addToPlayList: this.currentItem
                                     })
                                     this.props.navigation.navigate('PlayList')
