@@ -5,9 +5,12 @@ import color from '../misc/color';
 import PlayListInputModal from '../Components/PlayListInputModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AudioContext } from '../Context/AudioProvider';
+import PlayListDetail from '../Components/PlayListDetail';
 
+let selectedPlayList = {};
 const PlayList = () => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [showPlayList, setShowPlayList] = useState(false);
 
     const context = useContext(AudioContext);
 
@@ -104,9 +107,11 @@ const PlayList = () => {
       }
 
       // if there is no audio
-      console.log('opening list');
+      selectedPlayList = playList;
+      setShowPlayList(true);
     }
   return (
+    <>
     <ScrollView contentContainerStyle={styles.container}>
 
       {playList.length ?
@@ -123,6 +128,8 @@ const PlayList = () => {
       </TouchableOpacity>
       <PlayListInputModal onSubmit={createPlayList} onClose={() => setModalVisible(false)} visible={modalVisible}/>
     </ScrollView>
+    <PlayListDetail visible={showPlayList} playlist={selectedPlayList} onclose={() => setShowPlayList(false)}/>
+    </>
   )
 }
 
