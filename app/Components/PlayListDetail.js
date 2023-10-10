@@ -4,8 +4,12 @@ import { Modal } from 'react-native'
 import { Dimensions } from 'react-native'
 import color from '../misc/color'
 import AudioListItem from './AudioListItem'
+import { selectAudio } from '../misc/audioController'
 
-const PlayListDetail = ({visible, playlist, onclose}) => {
+const PlayListDetail = ({visible, playlist, onclose, context}) => {
+    const playAudio = async (audio) =>{
+        await selectAudio(audio, context, {activePlayList: playlist, isPlayListRunning:true})
+    }
   return (
     <Modal visible={visible} animationType='slide' transparent onRequestClose={onclose}>
         <View style={styles.container}>
@@ -16,7 +20,7 @@ const PlayListDetail = ({visible, playlist, onclose}) => {
                 keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => (
                     <View style={{marginBottom: 10}}>
-                        <AudioListItem title={item.filename} duration={item.duration}/>
+                        <AudioListItem isPlaying={context.isPlaying} activeListItem={item.id === context.currentAudio.id} title={item.filename} duration={item.duration} onAudioPress={() => playAudio(item)}/>
                     </View>
                 )}
             />

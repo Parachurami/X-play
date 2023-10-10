@@ -128,7 +128,7 @@ const PlayList = () => {
       </TouchableOpacity>
       <PlayListInputModal onSubmit={createPlayList} onClose={() => setModalVisible(false)} visible={modalVisible}/>
     </ScrollView>
-    <PlayListDetail visible={showPlayList} playlist={selectedPlayList} onclose={() => setShowPlayList(false)}/>
+    <PlayListDetail visible={showPlayList} playlist={selectedPlayList} onclose={() => setShowPlayList(false)} context={context}/>
     </>
   )
 }

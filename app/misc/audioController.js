@@ -51,20 +51,23 @@ export const playNext = async ( playbackObj, uri ) =>{
     }
 }
 
-export const selectAudio = async (audio, context) =>{
+export const selectAudio = async (audio, context, playListInfo = {}) =>{
     const {playbackObj, soundObj, currentAudio, updateState, audioFiles, onPlaybackStatusUpdate} = context;
     try {
         //Playing Audio For The First Time
         if(soundObj === null){
             const status = await play(playbackObj, audio.uri)
-            const index = audioFiles.indexOf(audio)
+            const index = audioFiles.findIndex(({id}) => id === audio.id)
             console.log(status);
             updateState(context, 
                 {
                     soundObj: status, 
                     currentAudio: audio,
                     isPlaying: true,
-                    currentAudioIndex: index
+                    currentAudioIndex: index,
+                    isPlayListRunning:false,
+                    activePlayList:[],
+                    ...playListInfo
                 }
             );
             playbackObj.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate)
@@ -73,7 +76,7 @@ export const selectAudio = async (audio, context) =>{
         // pause audio
         if(soundObj.isLoaded && soundObj.isPlaying && currentAudio.id === audio.id){
             const status = await pause(playbackObj)
-            return updateState(context, {soundObj: status, isPlaying: false})
+            return updateState(context, {soundObj: status, isPlaying: false, playbackPosition: status.positionMillis})
         }
 
         // resume audio
@@ -85,8 +88,16 @@ export const selectAudio = async (audio, context) =>{
         // select another audio
         if(soundObj.isLoaded && currentAudio.id !== audio.id){
             const status = await playNext(playbackObj, audio.uri)
-            const index = audioFiles.indexOf(audio);
-            updateState(context, {currentAudio: audio, soundObj: status, currentAudioIndex: index, isPlaying: true})
+            const index = audioFiles.findIndex(({id}) => id === audio.id)
+            updateState(context, {
+                currentAudio: audio, 
+                soundObj: status, 
+                currentAudioIndex: index, 
+                isPlaying: true, 
+                isPlayListRunning:false,
+                activePlayList:[],
+                ...playListInfo
+            })
             return storeAudioForNextOpening(audio,index);
         }
     } catch (error) {
@@ -165,4 +176,23 @@ export const changeAudio = async (context, select) =>{
     } catch (error) {
         console.log('Eorr inside Change Audio Method', error.message)
     }
+}
+
+export const moveAudio = async (context, value) =>{
+    const {soundObj, isPlaying, playbackObj, updateState} = context;
+    if(soundObj === null || !isPlaying) return;
+    try {
+      const status = await playbackObj.setPositionAsync(
+        Math.floor(soundObj.durationMillis * value)
+      )
+      updateState(context, {
+        soundObj: status,
+        playbackPosition: status.positionMillis
+      })
+      await resume(playbackObj)
+    } catch (error) {
+      console.log('Error inside onSlidingComplete callback', error)
+
+    }
+    
 }
